@@ -59,4 +59,8 @@ export class MongoModel {
     countAllByFilter(fileterObj: object): Promise<object> {
         return this.MongoModel.countDocuments(fileterObj);
     }
+
+    findOneAndUpdate(fileterObj: object, updateObj: object, options: object = {}): Promise<object> {
+        return this.MongoModel.findOneAndUpdate(fileterObj, updateObj, options)
+    }
 }
