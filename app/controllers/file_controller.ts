@@ -17,6 +17,7 @@ export class FileController {
 
     resizeImage = async(event: any) => {
         try {
+            const startTime = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
             const image_id: string = event.image_id;
             const worker_id: number = process.pid;
             if (image_id) {
@@ -34,7 +35,6 @@ export class FileController {
                 };
                 await this._jobsModel.addNewRecord(jobs_insert); */
                 const claimJob: any = await this._jobsModel.claimImageForProcessing(image_id, worker_id);
-                console.log("claimJob", claimJob)
                 if (!claimJob) {
                     console.log(`[Worker ${worker_id}] Job already claimed for ${image_id}`)
                     return;
@@ -57,7 +57,7 @@ export class FileController {
                         const transformer = sharp()
                             .resize(800, 600)
                             .webp({ quality: 80 })
-                            .on('info', (info) => console.log("Image processed:", info));
+                            .on('info', (info) => console.log("Image processed:"));
                     
                         // 2. Set up source and destination paths
                         const outputDir = path.dirname(image_path);
@@ -72,10 +72,13 @@ export class FileController {
                         await pipeline(input, transformer, output);
                         const update_obj: any = {status: 'resized', updated_timestamp: moment().format("YYYY-MM-DD HH:mm:ss")};
                         const update = await this._filesModel.updateAnyRecord({image_id: image_id}, update_obj);
+                        const endTime = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
+                        const processingTime = moment(endTime).diff(moment(startTime), 'milliseconds');
                         await this._jobsModel.updateAnyRecord({entity_id: image_id}, {
                             $set : {
                                 'status' : 'completed',
-                                'completed_at' : moment().format("YYYY-MM-DD HH:mm:ss")
+                                'completed_at' : moment().format("YYYY-MM-DD HH:mm:ss"),
+                                'processing_time' : processingTime,
                             }
                         })
                         console.log("File Resized successfully")
