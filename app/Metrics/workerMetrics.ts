@@ -1,6 +1,8 @@
 export const workerMetrics = {
     consumedCount: 0,
     processingDuration: [] as number[],
-    failedCount: 0
+    failedCount: 0,
+    ackCount: 0,
+    cpu : [] as object[]
 }
 

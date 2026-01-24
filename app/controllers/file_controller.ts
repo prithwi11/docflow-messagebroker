@@ -72,6 +72,7 @@ export class FileController {
                         await pipeline(input, transformer, output);
                         const update_obj: any = {status: 'resized', updated_timestamp: moment().format("YYYY-MM-DD HH:mm:ss")};
                         const update = await this._filesModel.updateAnyRecord({image_id: image_id}, update_obj);
+
                         await this._jobsModel.updateAnyRecord({entity_id: image_id}, {
                             $set : {
                                 'status' : 'completed',
@@ -97,6 +98,7 @@ export class FileController {
         }
         catch(error: any) {
             console.log("Error in file processing", error.stack);
+            throw error;
         }
     }
 }

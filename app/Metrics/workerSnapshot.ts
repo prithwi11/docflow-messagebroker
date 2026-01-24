@@ -64,7 +64,6 @@ export async function buildWorkerSnapshot() {
   const queue_metrics = await getQueueDepth(); // await here!
   const { queue_depth } = queue_metrics;
   const resource_metrics: any = await getResourceMetrics();
-
   return {
     queue: {
       consume_rate: workerMetrics.consumedCount / 60,
@@ -75,14 +74,18 @@ export async function buildWorkerSnapshot() {
       processing_time_p95: percentile(workerMetrics.processingDuration, 95),
       failed_processing_count: workerMetrics.failedCount,
     },
-    resource: {
-      cpu_percent: resource_metrics.cpu_percent,
-      memory_rss_mb: resource_metrics.memory_rss_mb,
-      memory_heap_used_mb: resource_metrics.memory_heap_used_mb,
-      memory_heap_total_mb: resource_metrics.memory_heap_total_mb,
-      memory_percent: resource_metrics.memory_percent,
-      event_loop_lag_ms: resource_metrics.event_loop_lag_ms,
-      cpu_use: process.cpuUsage()
+    track : {
+      ackCount : workerMetrics.ackCount,
+      cpu: workerMetrics.cpu
     }
+  //   resource: {
+  //     cpu_percent: resource_metrics.cpu_percent,
+  //     memory_rss_mb: resource_metrics.memory_rss_mb,
+  //     memory_heap_used_mb: resource_metrics.memory_heap_used_mb,
+  //     memory_heap_total_mb: resource_metrics.memory_heap_total_mb,
+  //     memory_percent: resource_metrics.memory_percent,
+  //     event_loop_lag_ms: resource_metrics.event_loop_lag_ms,
+  //     cpu_use: process.cpuUsage()
+  //   }
   };
 }

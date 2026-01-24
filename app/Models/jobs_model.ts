@@ -35,7 +35,7 @@ export class JobsModel extends MongoModel {
             const result: any = await this.findOneAndUpdate(
                 {
                     entity_id: image_id,
-                    status: { $in: ['processing', 'pending'] }  // 🔑 KEY FIX: Only find active jobs
+                    status: { $in: ['processing', 'pending'] }  
                 },
                 {
                     $setOnInsert: jobs_insert
