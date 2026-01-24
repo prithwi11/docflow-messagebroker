@@ -28,5 +28,11 @@ export class FileModel extends MongoModel {
         })
     }
 
+    async maybeFail(probablity = 0.1) {
+        if (Math.random() < probablity) {
+            throw new Error("Simulated transient DB Failure");
+        }
+    }
+
     async claimImageForProcessing(image_id: string, worker_id: number) {}
 }

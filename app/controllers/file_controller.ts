@@ -74,6 +74,7 @@ export class FileController {
                         const update = await this._filesModel.updateAnyRecord({image_id: image_id}, update_obj);
                         const endTime = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
                         const processingTime = moment(endTime).diff(moment(startTime), 'milliseconds');
+
                         await this._jobsModel.updateAnyRecord({entity_id: image_id}, {
                             $set : {
                                 'status' : 'completed',
@@ -100,6 +101,7 @@ export class FileController {
         }
         catch(error: any) {
             console.log("Error in file processing", error.stack);
+            throw error;
         }
     }
 }
