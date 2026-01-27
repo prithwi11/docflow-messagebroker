@@ -1,6 +1,11 @@
 import amqp from "amqplib"
 import dotenv from "dotenv"
 import { FileController } from "./app/controllers/file_controller"
+import { workerMetricsEmitter } from "./app/Metrics/workerEventEmitter"
+import { buildWorkerSnapshot } from "./app/Metrics/workerSnapshot"
+import fs from "fs"
+import { workerMetrics } from "./app/Metrics/workerMetrics"
+import "./app/Metrics/workerListener"
 
 dotenv.config()
 
@@ -12,11 +17,24 @@ const queue_name = process.env.QUEUE_NAME as string
 const fileController = new FileController();
 async function consume() {
     try {
+        const startCpu = process.cpuUsage();
+        const startHr = process.hrtime.bigint();
+
         const connection  = await amqp.connect(process.env.RABBITMQ_HOST as string);
         const channel = await connection.createChannel();
         await channel.assertQueue(queue_name, {
-            durable: true
+            durable: true,
+            // deadLetterExchange : 'dlx_exchange',
+            // deadLetterRoutingKey : 'dl1_key',
         });
+
+        await channel.assertQueue('dlq_queue', {
+            durable : true,
+        });
+
+        await channel.assertExchange('dlx_exchange', 'direct', {durable : true});
+        await channel.bindQueue('dlq_queue', 'dlx_exchange', 'dlq_queue');
+
         console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue_name);
         channel.prefetch(1);
         channel.consume(queue_name, async function (message:any) {
@@ -41,9 +59,26 @@ async function consume() {
                 if (process.send) {
                     process.send({type : 'error', messageId : message.properties.messageId, error: error.message, errorCount});
                 }
-                channel.nack(message, false, false)
-            }
-                        
+                const headers = message.properties.headers || {};
+                const retryCount = headers['x-retry-count'] || 0;
+                if (retryCount < 3) {
+                    channel.sendToQueue(
+                        queue_name,
+                        message.content,
+                        {
+                            headers : {
+                                ...headers,
+                                'x-retry-count' : retryCount + 1
+                            },
+                            persistent : true
+                        }
+                    ),
+                    channel.ack(message)
+                }
+                else {
+                    channel.nack(message, false, false)
+                }
+            }            
         }, {
             noAck: false
         });
@@ -85,5 +120,17 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error(`[${process.pid}] Unhandled rejection:`, reason);
     process.exit(1);
 });
+setInterval(async() => {
+    const snapshot = await buildWorkerSnapshot();
+    fs.appendFileSync(
+        "./worker-metrics.json",
+        JSON.stringify(snapshot) + "\n",
+        { encoding: "utf-8" }
+    );
+
+
+    workerMetrics.ackCount = 0;
+    workerMetrics.cpu = [];
+}, 10_000)
 
 consume();

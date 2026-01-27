@@ -10,3 +10,10 @@ workerMetricsEmitter.on("message_processed", (data: any) => {
     workerMetrics.processingDuration.push(data.durationMs)
     if (!data.success) workerMetrics.failedCount++
 })
+
+workerMetricsEmitter.on("message_acknowledged", (data: any) => {
+    console.log(data)
+    workerMetrics.ackCount++;
+    workerMetrics.cpu.push(data);
+    console.log(">>>>>>>>>>>>", workerMetrics)
+});
