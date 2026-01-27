@@ -1,6 +1,7 @@
-import { S3Client, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand, DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
+import * as fs from "fs"
 
 export class AwsHelper {
   private client: S3Client;
@@ -58,5 +59,25 @@ export class AwsHelper {
     );
 
     return { success: true, message: "File deleted from S3" };
+  }
+
+  public s3Upload = async(localFilePath: string, filename: string) => {
+      let that = this;
+      return new Promise(function (resolve, reject) {
+          const command = new PutObjectCommand({
+              Bucket: process.env.S3_BUCKET,
+              Key: `${process.env.S3_RESIZE_FOLDER}/${filename}`,
+              Body: fs.readFileSync(localFilePath),
+          });
+          that.client.send(command, (err: object, data: any) => {
+              if (err) return resolve({error: true, message: "Unable to upload file in S3", errorStack: err});
+              else {
+                  fs.unlink(localFilePath, (err => {
+                      if (err) console.error(err)
+                  }));
+                  return resolve({error: false, message: "File uploaded to S3 successfully",});
+              }
+          })
+      })
   }
 }

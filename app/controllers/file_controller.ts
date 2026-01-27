@@ -85,7 +85,8 @@ export class FileController {
                                 'completed_at' : moment().format("YYYY-MM-DD HH:mm:ss"),
                                 'processing_time' : processingTime,
                             }
-                        })
+                        });
+                        const s3Response: any = await this._awsHelper.s3Upload( localInputPath, image_name);
                         console.log("File Resized successfully")
                     }
                 }
