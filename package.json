@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.975.0",
     "amqp": "^0.2.7",
     "amqplib": "^0.10.9",
     "axios": "^1.13.2",
