@@ -7,12 +7,19 @@ export class MongoModel {
     private schema: {}
     public MongoModel: any;
 
-    constructor(name: string, schema: {}, schemaOptions: any = {}) {
-        let connection = new Connection();
-        this.connection = connection.connect();
-        this.schema = this.connection.Schema(schema, schemaOptions);
-        this.connection.models = {};
-        this.MongoModel = this.connection.model(name, this.schema);
+    constructor(name: string, schema: {}, schemaOptions: any = {}, test_connection?: any) {
+        if (test_connection) {
+            this.schema = test_connection.Schema(schema, schemaOptions);
+            test_connection.models = {};
+            this.MongoModel = test_connection.model(name, this.schema);
+        }
+        else {
+            let connection = new Connection();
+            this.connection = connection.connect();
+            this.schema = this.connection.Schema(schema, schemaOptions);
+            this.connection.models = {};
+            this.MongoModel = this.connection.model(name, this.schema);
+        }
     }
 
     addNewRecord(dataobj: object): Promise<object> {

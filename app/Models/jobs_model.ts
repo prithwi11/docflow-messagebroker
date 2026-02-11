@@ -2,7 +2,7 @@ import { MongoModel } from "../../model";
 import moment from "moment"
 
 export class JobsModel extends MongoModel {
-    constructor() {
+    constructor(test_connection?:any) {
         super(
             'jobs',
             {
@@ -16,7 +16,9 @@ export class JobsModel extends MongoModel {
                 started_at: {type: Date, required: false},
                 completed_at: {type: Date, required: false},
                 processing_time: {type: String, required: false}
-            }
+            },
+            {},
+            test_connection
         )
     }
 

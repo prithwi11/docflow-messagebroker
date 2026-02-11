@@ -1,7 +1,9 @@
 import { S3helperClient, S3helperClientresponse } from "../../../common_interface";
-import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, HeadObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import fs, { createWriteStream } from "fs"
 import { pipeline } from "stream/promises";
+import dotenv from "dotenv"
+dotenv.config()
 
 export class TestS3Config {
     private client: S3helperClient;
@@ -120,5 +122,22 @@ export class TestS3Config {
             continuationToken = NextContinuationToken;
         }
         console.log("Bucket is now empty.");
+    }
+
+    public async verifyS3ObjectExists(file_name: string) {
+        const command = new HeadObjectCommand({
+            Bucket: process.env.S3_TEST_BUCKET,
+            Key: file_name
+        });
+
+        await this.client.send(command, (err: any) => {
+            if (err) {
+                if (err.name = "NotFound" || err.$metadata?.httpStatusCode === 404) {
+                    return false
+                }
+                throw new Error(err);
+            }
+            return true;
+        })
     }
 }

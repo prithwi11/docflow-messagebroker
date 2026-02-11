@@ -1,31 +1,65 @@
 import mongoose, { Connection, Schema, Model } from "mongoose";
+import dotenv from "dotenv"
+dotenv.config()
 
 export class TestDatabase {
+    private connection: Connection | null = null;
+
     // Generates a standalone connection object
-    async createStandaloneConnection() {
+    async createStandaloneConnection_old(): Promise<Connection> {
+        if (this.connection) {
+            return this.connection
+        }
+
         const uri = `${process.env.MONGODB_URI}${process.env.TEST_DB_NAME}`;
+        console.log("uri", uri)
         try {
             // .createConnection() returns a Connection object, not the mongoose singleton
-            const conn = await mongoose.createConnection(uri).asPromise();
-            console.log("Independent Connection Established to:", conn.host);
-            return conn;
+            this.connection = await mongoose.createConnection(uri).asPromise();
+            console.log("Independent Connection Established to:", this.connection.host);
+            return this.connection;
         } catch (error: any) {
             console.error("Connection error:", error.message);
             throw error;
         }
     }
+
+    async createStandaloneConnection() {
+        try {
+            mongoose.connect(`${process.env.MONGODB_URI}${process.env.TEST_DB_NAME}`).then((res) => {
+                
+                mongoose.connection.useDb(process.env.DB_NAME || "");
+                console.log("Connected to MongoDB Database", res.connection.host);
+            }).catch((err: any) => console.log("Error from MongoDB", err));
+            return mongoose;
+        } catch (error: any) {
+            console.log("Error connecting to MongoDB:", error.message)
+        }
+    }
+
+    async closeConnection() {
+        if (this.connection) {
+            await this.connection.close();
+            this.connection = null;
+        }
+    }
+
+    getConnection(): Connection {
+        if(!this.connection) {
+            throw new Error("Connection not established")
+        }
+        return this.connection
+    }
 }
 
 export class MongoModel {
-    private connection: Connection;
     public model: any;
 
     constructor(connection: Connection, name: string, schemaDefinition: object, schemaOptions: any = {}) {
-        this.connection = connection;
         const schema = new Schema(schemaDefinition, schemaOptions);
         
         // Define the model specifically on this independent connection
-        this.model = this.connection.model(name, schema);
+        this.model = connection.model(name, schema);
     }
 
     async addNewRecord(dataobj: object): Promise<any> {
@@ -58,10 +92,5 @@ export class MongoModel {
 
     async countAllByFilter(filterObj: object): Promise<number> {
         return this.model.countDocuments(filterObj).exec();
-    }
-
-    // Helper to close this specific connection
-    async close() {
-        await this.connection.close();
     }
 }
