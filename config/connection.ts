@@ -1,11 +1,18 @@
 import mongoose from "mongoose";
-
+import dotenv from "dotenv"
+import { AppConfig, configs } from "./app.config";
+dotenv.config()
 export class Connection {
+    private _config: AppConfig;
+    constructor(appConfig: AppConfig = configs) {
+        this._config = appConfig;
+    }
     connect() {
         try {
-            mongoose.connect(`${process.env.MONGODB_URI}${process.env.DB_NAME}`).then((res) => {
+            const db = this._config.dbName;
+            mongoose.connect(`${process.env.MONGODB_URI}${db}`).then((res) => {
                 
-                mongoose.connection.useDb(process.env.DB_NAME || "");
+                mongoose.connection.useDb(process.env.db || "");
                 console.log("Connected to MongoDB Database", res.connection.host);
             }).catch((err: any) => console.log("Error from MongoDB", err));
             return mongoose;

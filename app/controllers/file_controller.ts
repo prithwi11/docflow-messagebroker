@@ -7,15 +7,19 @@ import { FileModel } from "../Models/file_model";
 import moment from "moment"
 import { JobsModel } from "../Models/jobs_model";
 import { AwsHelper } from "../../helper/s3_helper";
+import { AppConfig, configs } from "../../config/app.config";
 
 dotenv.config()
 
 
 export class FileController {
-    constructor() {}
     private _filesModel: any = new FileModel();
     private _jobsModel : any = new JobsModel();
     private _awsHelper = new AwsHelper();
+    private _config: AppConfig;
+    constructor(appConfig: AppConfig = configs) {
+        this._config = appConfig
+    }
 
     resizeImage = async(event: any) => {
         try {
@@ -54,14 +58,16 @@ export class FileController {
                         await this._filesModel.trackProcessingAttempt(image_id, worker_id) */
 
                         const image_name = image_details.image_name;
-                        const localInputPath = path.resolve(process.env.IMAGE_PATH as string, image_name);
+                        console.log("this._config.imagePath", this._config)
+                        const localInputPath = path.resolve(this._config.imagePath, image_name);
                         
                         // 2. Set up source and destination paths
                         const outputDir = path.dirname(localInputPath);
                         const outputFileName = `${path.parse(image_name).name}.webp`;
                         const outputPath = path.join(outputDir, outputFileName);
                         
-                        await this._awsHelper.downloadFromS3({bucket: process.env.S3_BUCKET as string, key: image_name, destinationPath: localInputPath});
+                        const bucket_name = this._config.s3Bucket
+                        await this._awsHelper.downloadFromS3({bucket: bucket_name as string, key: image_name, destinationPath: localInputPath});
                         
                         const transformer = sharp()
                             .resize(800, 600)
@@ -86,7 +92,7 @@ export class FileController {
                                 'processing_time' : processingTime,
                             }
                         });
-                        const s3Response: any = await this._awsHelper.s3Upload( localInputPath, image_name);
+                        const s3Response: any = await this._awsHelper.s3Upload( localInputPath, image_name, bucket_name);
                         console.log("File Resized successfully")
                     }
                 }

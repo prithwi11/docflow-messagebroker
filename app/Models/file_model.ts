@@ -3,7 +3,7 @@ import { MongoModel } from "../../model"
 
 export class FileModel extends MongoModel {
 
-    constructor(test_connection?: any) {
+    constructor() {
         super(
             'file_details',
             {
@@ -13,9 +13,7 @@ export class FileModel extends MongoModel {
                 status: {type: String, required: true},
                 added_timestamp: {type: Date, required: true},
                 updated_timestamp: {type: Date, required: false},
-            },
-            {},
-            test_connection
+            }
         )
     }
 

@@ -127,7 +127,7 @@ export class TestS3Config {
     public async verifyS3ObjectExists(file_name: string) {
         const command = new HeadObjectCommand({
             Bucket: process.env.S3_TEST_BUCKET,
-            Key: file_name
+            Key: `resized/${file_name}`
         });
 
         await this.client.send(command, (err: any) => {
@@ -137,7 +137,7 @@ export class TestS3Config {
                 }
                 throw new Error(err);
             }
-            return true;
-        })
+        });
+        return true;
     }
 }

@@ -21,9 +21,9 @@ describe("Test 1: End-to-End Image Processing", () => {
     let workerProcess: any;
 
     beforeAll(async() => {
-        const connection = await test_db.createStandaloneConnection();
-        filesModel = new FileModel(connection);
-        jobsModel = new JobsModel(connection);
+        // const connection = await test_db.createStandaloneConnection();
+        filesModel = new FileModel();
+        jobsModel = new JobsModel();
 
         // Start worker process
         workerProcess = await spawnWorker();
@@ -75,7 +75,7 @@ describe("Test 1: End-to-End Image Processing", () => {
                         if (file_details && file_details.status == expectedStatus) {
                             return true;
                         }
-                        sleep(200) //poll every 200ms
+                        await sleep(200) //poll every 200ms
                     }
                 }
                 
@@ -84,9 +84,9 @@ describe("Test 1: End-to-End Image Processing", () => {
                 }
 
 
-                await waitForJobStatus(insert_to_test_file_obj.image_id, "completed", 10000);
+                await waitForJobStatus(insert_to_test_file_obj.image_id, "resized", 10000);
                 const file_status = await filesModel.findByAny({image_id: insert_to_test_file_obj.image_id});
-                expect(file_status.status).toBe("completed");
+                expect(file_status.status).toBe("resized");
 
                 // Check resized file exists
                 const check_resized_file_exists = await test_s3_setup.verifyS3ObjectExists(test_image);

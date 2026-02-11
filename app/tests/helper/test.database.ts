@@ -28,7 +28,7 @@ export class TestDatabase {
         try {
             mongoose.connect(`${process.env.MONGODB_URI}${process.env.TEST_DB_NAME}`).then((res) => {
                 
-                mongoose.connection.useDb(process.env.DB_NAME || "");
+                mongoose.connection.useDb(process.env.TEST_DB_NAME || "");
                 console.log("Connected to MongoDB Database", res.connection.host);
             }).catch((err: any) => console.log("Error from MongoDB", err));
             return mongoose;
