@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx worker.ts",
     "build": "rm -rf dist && tsc",
-    "start": "node dist/worker.js"
+    "start": "node dist/worker.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -21,11 +22,16 @@
     "dotenv": "^17.2.3",
     "moment": "^2.30.1",
     "mongoose": "^9.1.4",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.8",
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.0.6",
+    "canvas": "^3.2.1",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"

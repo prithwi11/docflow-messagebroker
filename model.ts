@@ -1,7 +1,8 @@
 'use strict'
 import Mongoose from "mongoose"
 import { Connection } from "./config/connection";
-
+import dotenv from "dotenv"
+dotenv.config();
 export class MongoModel {
     private connection: any
     private schema: {}
@@ -13,6 +14,7 @@ export class MongoModel {
         this.schema = this.connection.Schema(schema, schemaOptions);
         this.connection.models = {};
         this.MongoModel = this.connection.model(name, this.schema);
+    
     }
 
     addNewRecord(dataobj: object): Promise<object> {

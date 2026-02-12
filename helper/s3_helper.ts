@@ -2,11 +2,15 @@ import { S3Client, GetObjectCommand, DeleteObjectCommand, PutObjectCommand } fro
 import { createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 import * as fs from "fs"
+import { AppConfig, configs } from "../config/app.config";
 
 export class AwsHelper {
   private client: S3Client;
+  private _config: AppConfig;
 
-  constructor() {
+  constructor(appConfig: AppConfig = configs) {
+    this._config = appConfig;
+
     this.client = new S3Client({
       region: process.env.AWS_DEFAULT_REGION!,
       credentials: {
@@ -61,23 +65,23 @@ export class AwsHelper {
     return { success: true, message: "File deleted from S3" };
   }
 
-  public s3Upload = async(localFilePath: string, filename: string) => {
+  public s3Upload = async(localFilePath: string, filename: string, bucket_name: string) => {
       let that = this;
       return new Promise(function (resolve, reject) {
-          const command = new PutObjectCommand({
-              Bucket: process.env.S3_BUCKET,
+            const command = new PutObjectCommand({
+              Bucket: bucket_name,
               Key: `${process.env.S3_RESIZE_FOLDER}/${filename}`,
               Body: fs.readFileSync(localFilePath),
-          });
-          that.client.send(command, (err: object, data: any) => {
+            });
+            that.client.send(command, (err: object, data: any) => {
               if (err) return resolve({error: true, message: "Unable to upload file in S3", errorStack: err});
               else {
-                  fs.unlink(localFilePath, (err => {
-                      if (err) console.error(err)
-                  }));
-                  return resolve({error: false, message: "File uploaded to S3 successfully",});
+                fs.unlink(localFilePath, (err => {
+                  if (err) console.error(err)
+                }));
+                return resolve({error: false, message: "File uploaded to S3 successfully",});
               }
-          })
+            });
       })
   }
 }

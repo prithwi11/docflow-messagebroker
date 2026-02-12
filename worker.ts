@@ -13,7 +13,7 @@ dotenv.config()
 let processCount = 0;
 let errorCount = 0;
 
-const queue_name = process.env.QUEUE_NAME as string
+const queue_name = process.env.NODE_ENV == "test" ? process.env.TEST_QUEUE_NAME as string : process.env.QUEUE_NAME as string
 const fileController = new FileController();
 async function consume() {
     try {

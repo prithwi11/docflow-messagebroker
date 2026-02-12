@@ -16,7 +16,7 @@ export class JobsModel extends MongoModel {
                 started_at: {type: Date, required: false},
                 completed_at: {type: Date, required: false},
                 processing_time: {type: String, required: false}
-            }
+            },
         )
     }
 
