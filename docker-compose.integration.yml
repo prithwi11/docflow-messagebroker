@@ -1,0 +1,21 @@
+version : "3.9"
+
+services:
+  mongo:
+    image: mongo:7
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+
+  test_runner:
+    build: 
+      context: .
+      target: test
+    environment:
+      NODE_ENV: test
+      MONGODB_URI: mongodb://mongo:27017/testdb
+      RABBITMQ_HOST: amqp://rabbitmq:5672
+    depends_on:
+      - mongo
+      - rabbitmq
+    # command: npm run test

@@ -132,7 +132,7 @@ export class TestS3Config {
 
         await this.client.send(command, (err: any) => {
             if (err) {
-                if (err.name = "NotFound" || err.$metadata?.httpStatusCode === 404) {
+                if (err.name == "NotFound" || err.$metadata?.httpStatusCode === 404) {
                     return false
                 }
                 throw new Error(err);
