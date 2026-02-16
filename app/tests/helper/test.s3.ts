@@ -3,17 +3,21 @@ import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, HeadObject
 import fs, { createWriteStream } from "fs"
 import { pipeline } from "stream/promises";
 import dotenv from "dotenv"
-dotenv.config()
+dotenv.config();
+import { AppConfig, configs } from "../../../config/app.config";
 
 export class TestS3Config {
     private client: S3helperClient;
+    private _config: AppConfig;
 
-    constructor() {
+    constructor(appConfig: AppConfig = configs) {
+        this._config = appConfig;
+
         this.client = new S3Client({
-            region: process.env.AWS_DEFAULT_REGION!,
+            region: this._config.awsRegion!,
             credentials: {
-                  accessKeyId: process.env.AWS_ACCESS_KEY as string,
-                  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string
+                  accessKeyId: this._config.awsAccessKey as string,
+                  secretAccessKey: this._config.awsSecretAccessKey as string
             }
         });
     }
@@ -22,7 +26,7 @@ export class TestS3Config {
         let that = this;
         return new Promise(function (resolve, reject) {
             const command = new PutObjectCommand({
-                Bucket: process.env.S3_TEST_BUCKET,
+                Bucket: that._config.s3Bucket,
                 Key: filename,
                 Body: fs.readFileSync(localFilePath)
             });
@@ -42,7 +46,7 @@ export class TestS3Config {
         let that = this;
         return new Promise(function (resolve, reject) {
             const command = new DeleteObjectCommand({
-                Bucket: process.env.S3_TEST_BUCKET,
+                Bucket: that._config.s3Bucket,
                 Key: filepath
             });
 
@@ -91,7 +95,7 @@ export class TestS3Config {
 
         while (isTruncated) {
             const list_params = {
-                Bucket: process.env.S3_TEST_BUCKET,
+                Bucket: this._config.s3Bucket,
                 ContinuationToken: continuationToken
             }
 
@@ -103,7 +107,7 @@ export class TestS3Config {
 
             if (!Contents || Contents.length === 0) break;
             const deleteParams = {
-                Bucket: process.env.S3_TEST_BUCKET,
+                Bucket: this._config.s3Bucket,
                 Delete: {
                   Objects: Contents.map((item: any) => ({ Key: item.Key })),
                   Quiet: true,
@@ -126,7 +130,7 @@ export class TestS3Config {
 
     public async verifyS3ObjectExists(file_name: string) {
         const command = new HeadObjectCommand({
-            Bucket: process.env.S3_TEST_BUCKET,
+            Bucket: this._config.s3Bucket,
             Key: `resized/${file_name}`
         });
 

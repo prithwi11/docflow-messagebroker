@@ -6,21 +6,23 @@ import { buildWorkerSnapshot } from "./app/Metrics/workerSnapshot"
 import fs from "fs"
 import { workerMetrics } from "./app/Metrics/workerMetrics"
 import "./app/Metrics/workerListener"
-
+import { AppConfig, configs } from "./config/app.config"
 dotenv.config()
+
+let appConfig: AppConfig = configs;
 
 //Track worker stats
 let processCount = 0;
 let errorCount = 0;
 
-const queue_name = process.env.NODE_ENV == "test" ? process.env.TEST_QUEUE_NAME as string : process.env.QUEUE_NAME as string
+const queue_name = appConfig.queueName
 const fileController = new FileController();
 async function consume() {
     try {
         const startCpu = process.cpuUsage();
         const startHr = process.hrtime.bigint();
 
-        const connection  = await amqp.connect(process.env.RABBITMQ_HOST as string);
+        const connection  = await amqp.connect(appConfig.rabbitmqHost as string);
         const channel = await connection.createChannel();
         await channel.assertQueue(queue_name, {
             durable: true,

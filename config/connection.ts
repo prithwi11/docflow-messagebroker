@@ -10,9 +10,9 @@ export class Connection {
     connect() {
         try {
             const db = this._config.dbName;
-            mongoose.connect(`${process.env.MONGODB_URI}${db}`).then((res) => {
+            mongoose.connect(`${this._config.mongoUri}${db}`).then((res) => {
                 
-                mongoose.connection.useDb(process.env.db || "");
+                mongoose.connection.useDb(this._config.dbName || "");
                 console.log("Connected to MongoDB Database", res.connection.host);
             }).catch((err: any) => console.log("Error from MongoDB", err));
             return mongoose;

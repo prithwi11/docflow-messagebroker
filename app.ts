@@ -3,9 +3,11 @@ import amqp from "amqplib"
 import http from "http"
 import dotenv from "dotenv"
 dotenv.config();
+import { AppConfig, configs } from "./config/app.config";
 
 let mongoReady = false
 let rabbitReady = false
+let appConfig: AppConfig = configs;
 
 async function setMongoReady(status: boolean) {
     mongoReady = status;
@@ -43,7 +45,7 @@ async function startup() {
         if (connectToMongo) {
             setMongoReady(true);
         }
-        const connection  = await amqp.connect(process.env.RABBITMQ_HOST as string);
+        const connection  = await amqp.connect(appConfig.rabbitmqHost as string);
         if (connection) {
             setRabbitReady(true);
         }

@@ -10,7 +10,7 @@ export function spawnWorker() : ChildProcess {
             NODE_ENV:"test",
             TEST_QUEUE_NAME:"file-processor-test",
             TEST_DB_NAME:"docflow_test",
-            S3_TEST_BUCKET: "docflow-test-bucket"
+            S3_TEST_BUCKET: "docflow-test-bucket",
         },
         stdio: 'inherit'
     });

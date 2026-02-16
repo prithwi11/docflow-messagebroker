@@ -8,11 +8,14 @@ export interface AppConfig {
     environment: string,
     mongoUri: string,
     rabbitmqHost: string,
+    awsAccessKey: string,
+    awsSecretAccessKey: string,
+    s3ResizeFolder: string,
+    awsRegion: string
 }
 
 function loadConfig(): AppConfig {
     const env: string = process.env.NODE_ENV as string;
-    console.log("env", env)
     const configs: Record<string, AppConfig> = {
         production: {
             imagePath: process.env.IMAGE_PATH as string,
@@ -21,6 +24,10 @@ function loadConfig(): AppConfig {
             queueName: process.env.QUEUE_NAME as string,
             mongoUri: process.env.MONGODB_URI as string,
             rabbitmqHost: process.env.RABBITMQ_HOST as string,
+            awsAccessKey: process.env.AWS_ACCESS_KEY as string,
+            awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+            s3ResizeFolder: process.env.S3_RESIZE_FOLDER as string,
+            awsRegion: process.env.AWS_DEFAULT_REGION as string,
             environment: 'production'
         },
         staging: {
@@ -30,6 +37,10 @@ function loadConfig(): AppConfig {
             queueName: process.env.QUEUE_NAME as string,
             mongoUri: process.env.MONGODB_URI as string,
             rabbitmqHost: process.env.RABBITMQ_HOST as string,
+            awsAccessKey: process.env.AWS_ACCESS_KEY as string,
+            awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+            s3ResizeFolder: process.env.S3_RESIZE_FOLDER as string,
+            awsRegion: process.env.AWS_DEFAULT_REGION as string,
             environment: 'staging'
         },
         development: {
@@ -39,6 +50,10 @@ function loadConfig(): AppConfig {
             queueName: process.env.QUEUE_NAME as string,
             mongoUri: process.env.MONGODB_URI as string,
             rabbitmqHost: process.env.RABBITMQ_HOST as string,
+            awsAccessKey: process.env.AWS_ACCESS_KEY as string,
+            awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+            s3ResizeFolder: process.env.S3_RESIZE_FOLDER as string,
+            awsRegion: process.env.AWS_DEFAULT_REGION as string,
             environment: 'development'
         },
         test: {
@@ -48,6 +63,10 @@ function loadConfig(): AppConfig {
             queueName: process.env.TEST_QUEUE_NAME as string,
             mongoUri: process.env.MONGODB_URI as string,
             rabbitmqHost: process.env.RABBITMQ_HOST as string,
+            awsAccessKey: process.env.AWS_ACCESS_KEY as string,
+            awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+            s3ResizeFolder: process.env.S3_RESIZE_FOLDER as string,
+            awsRegion: process.env.AWS_DEFAULT_REGION as string,
             environment: 'test'
         },
     }
