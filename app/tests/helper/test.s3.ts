@@ -14,10 +14,12 @@ export class TestS3Config {
         this._config = appConfig;
 
         this.client = new S3Client({
-            region: this._config.awsRegion!,
+            region: "us-east-1",
+            endpoint: "http://localstack:4566",
+            forcePathStyle: true,
             credentials: {
-                  accessKeyId: this._config.awsAccessKey as string,
-                  secretAccessKey: this._config.awsSecretAccessKey as string
+              accessKeyId: "test",
+              secretAccessKey: "test"
             }
         });
     }

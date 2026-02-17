@@ -7,6 +7,14 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
 
+  localstack:
+    image: localstack/localstack
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=us-east-1
+    ports:
+      - "4566:4566"
+
   test_runner:
     build: 
       context: .
@@ -15,9 +23,10 @@ services:
       NODE_ENV: test
       MONGODB_URI: mongodb://mongo:27017/testdb
       RABBITMQ_HOST: amqp://rabbitmq:5672
-      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
-      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      S3_ENDPOINT: http://localstack:4566
     depends_on:
       - mongo
       - rabbitmq
