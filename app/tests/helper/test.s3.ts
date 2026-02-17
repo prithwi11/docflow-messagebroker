@@ -125,7 +125,6 @@ export class TestS3Config {
             isTruncated = IsTruncated;
             continuationToken = NextContinuationToken;
         }
-        console.log("Bucket is now empty.");
     }
 
     public async verifyS3ObjectExists(file_name: string) {
