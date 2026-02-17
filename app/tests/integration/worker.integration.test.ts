@@ -12,6 +12,7 @@ import { spawn } from "child_process";
 import { spawnWorker } from "../helper/test.worker";
 import dotenv from "dotenv"
 dotenv.config()
+import fs from "fs"
 
 
 describe("Test 1: End-to-End Image Processing", () => {
@@ -45,6 +46,8 @@ describe("Test 1: End-to-End Image Processing", () => {
             // Upload the image to S3 Bucket
             let local_file_path = path.join(__dirname, '..', 'uploads', test_image);
             const test_s3_setup = new TestS3Config();
+            console.log("Resolved path:", local_file_path);
+            console.log("Exists:", fs.existsSync(local_file_path));
             const upload_file_to_s3: any = await test_s3_setup.uploadFileToS3(local_file_path, test_image);
             console.log("upload_file_to_s3", upload_file_to_s3);
             expect(upload_file_to_s3.error).toBe(false);
