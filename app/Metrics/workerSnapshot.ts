@@ -3,7 +3,9 @@ import { workerMetrics } from "./workerMetrics";
 import axios from "axios";
 import os from "os"
 import { monitorEventLoopDelay } from "perf_hooks";
+import { AppConfig, configs } from "../../config/app.config";
 
+let appConfig: AppConfig = configs;
 const h = monitorEventLoopDelay({ resolution: 10 });
 h.enable();
 
@@ -19,7 +21,7 @@ async function getQueueDepth() {
     let queue_depth = 0;
     let ready_messages = 0;
     try {
-      const queue_metrics: any = await axios.get(`${process.env.RABBITMQ_URL}${process.env.QUEUE_NAME}`, {
+      const queue_metrics: any = await axios.get(`${appConfig.rabbitmqHost}${appConfig.queueName}`, {
         auth : {username: 'guest', password : 'guest'}
       });
       queue_depth = queue_metrics.data.messages;

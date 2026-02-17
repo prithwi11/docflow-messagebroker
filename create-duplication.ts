@@ -1,12 +1,15 @@
 import amqp from "amqplib"
 import dotenv from "dotenv"
+import { AppConfig, configs } from "./config/app.config";
 
 dotenv.config();
 
+let appConfig: AppConfig = configs;
+
 async function sendDuplicateMessage() {
-    const connection = await amqp.connect(process.env.RABBITMQ_HOST as string)
+    const connection = await amqp.connect(appConfig.rabbitmqHost as string)
     const channel = await connection.createChannel()
-    const queue_name = process.env.QUEUE_NAME as string
+    const queue_name = appConfig.queueName as string
 
     await channel.assertQueue(queue_name, {durable: true});
 

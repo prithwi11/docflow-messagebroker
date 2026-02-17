@@ -1,5 +1,8 @@
 import { fork } from "child_process";
 import amqp from "amqplib"
+import { AppConfig, configs } from "./config/app.config";
+
+let appConfig: AppConfig = configs;
 
 let workers: any[] = [];
 
@@ -20,9 +23,9 @@ function spawnWorker() {
 }
 
 async function getQueueDepth() {
-    const connection  = await amqp.connect(process.env.RABBITMQ_HOST as string);
+    const connection  = await amqp.connect(appConfig.rabbitmqHost as string);
     const channel = await connection.createChannel();
-    const queue_name: string = process.env.QUEUE_NAME as string;
+    const queue_name: string = appConfig.queueName as string;
     
     const result = await channel.assertQueue(queue_name);
 

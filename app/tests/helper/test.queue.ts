@@ -1,15 +1,19 @@
 import dotenv from "dotenv"
 dotenv.config()
+import { AppConfig, configs } from "../../../config/app.config";
 export class TestSQSHelper {
-    constructor() {}
+    private _config: AppConfig;
+    constructor(appConfig: AppConfig = configs) {
+        this._config = appConfig;
+    }
 
     pushMessageToQueue = async(params: any) => {
-        const queueName = process.env.TEST_QUEUE_NAME as string;
+        const queueName = this._config.queueName as string;
         const amqp = require('amqplib');
         const { v4: uuidv4 } = require('uuid');
 
         // connect to RabbitMQ
-        const connection = await amqp.connect(process.env.RABBITMQ_HOST);
+        const connection = await amqp.connect(this._config.rabbitmqHost);
 
         // create a channel
         const channel = await connection.createChannel();
@@ -44,9 +48,9 @@ export class TestSQSHelper {
     }
 
     purgeMessageFromQueue = async() => {
-        const queueName = process.env.TEST_QUEUE_NAME as string;
+        const queueName = this._config.queueName as string;
         const amqp = require('amqplib');
-        const connection = await amqp.connect(process.env.RABBITMQ_HOST);
+        const connection = await amqp.connect(this._config.rabbitmqHost);
 
         // create a channel
         const channel = await connection.createChannel();

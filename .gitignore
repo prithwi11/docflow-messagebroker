@@ -5,3 +5,4 @@ node_modules
 **.jpg
 **.pdf
 **.png
+/dist

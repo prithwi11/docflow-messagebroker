@@ -1,17 +1,22 @@
 import mongoose, { Connection, Schema, Model } from "mongoose";
 import dotenv from "dotenv"
 dotenv.config()
+import { AppConfig, configs } from "../../../config/app.config";
 
 export class TestDatabase {
     private connection: Connection | null = null;
+    private _config: AppConfig;
 
+    constructor(appConfig: AppConfig = configs) {
+        this._config = appConfig;
+    }
     // Generates a standalone connection object
     async createStandaloneConnection_old(): Promise<Connection> {
         if (this.connection) {
             return this.connection
         }
 
-        const uri = `${process.env.MONGODB_URI}${process.env.TEST_DB_NAME}`;
+        const uri = `${this._config.mongoUri}${this._config.dbName}`;
         console.log("uri", uri)
         try {
             // .createConnection() returns a Connection object, not the mongoose singleton
@@ -26,9 +31,9 @@ export class TestDatabase {
 
     async createStandaloneConnection() {
         try {
-            mongoose.connect(`${process.env.MONGODB_URI}${process.env.TEST_DB_NAME}`).then((res) => {
+            mongoose.connect(`${this._config.mongoUri}${this._config.dbName}`).then((res) => {
                 
-                mongoose.connection.useDb(process.env.TEST_DB_NAME || "");
+                mongoose.connection.useDb(this._config.dbName || "");
                 console.log("Connected to MongoDB Database", res.connection.host);
             }).catch((err: any) => console.log("Error from MongoDB", err));
             return mongoose;

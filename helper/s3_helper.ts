@@ -12,10 +12,10 @@ export class AwsHelper {
     this._config = appConfig;
 
     this.client = new S3Client({
-      region: process.env.AWS_DEFAULT_REGION!,
+      region: this._config.s3Bucket!,
       credentials: {
-            accessKeyId: process.env.AWS_ACCESS_KEY as string,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string
+            accessKeyId: this._config.awsAccessKey as string,
+            secretAccessKey: this._config.awsSecretAccessKey as string
       }
     });
   }
@@ -57,7 +57,7 @@ export class AwsHelper {
   public async deleteFileFromS3(key: string) {
     await this.client.send(
       new DeleteObjectCommand({
-        Bucket: process.env.S3_BUCKET!,
+        Bucket: this._config.s3Bucket!,
         Key: key,
       })
     );
@@ -70,7 +70,7 @@ export class AwsHelper {
       return new Promise(function (resolve, reject) {
             const command = new PutObjectCommand({
               Bucket: bucket_name,
-              Key: `${process.env.S3_RESIZE_FOLDER}/${filename}`,
+              Key: `${that._config.s3ResizeFolder}/${filename}`,
               Body: fs.readFileSync(localFilePath),
             });
             that.client.send(command, (err: object, data: any) => {
