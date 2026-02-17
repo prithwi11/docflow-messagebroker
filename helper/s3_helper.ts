@@ -12,7 +12,7 @@ export class AwsHelper {
     this._config = appConfig;
 
     this.client = new S3Client({
-      region: this._config.s3Bucket!,
+      region: this._config.awsRegion!,
       credentials: {
             accessKeyId: this._config.awsAccessKey as string,
             secretAccessKey: this._config.awsSecretAccessKey as string
