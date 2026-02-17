@@ -26,7 +26,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         run: |
           echo "Region before compose: ${{secrets.AWS_REGION}}, $AWS_ACCESS_KEY_ID, $AWS_SECRET_ACCESS_KEY_ID"
-          sudo docker compose -f docker-compose.integration.yml up \
+          docker compose -f docker-compose.integration.yml up \
             --build \
             --abort-on-container-exit \
             --exit-code-from test_runner
