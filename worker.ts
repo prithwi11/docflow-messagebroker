@@ -10,6 +10,7 @@ import { AppConfig, configs } from "./config/app.config"
 dotenv.config()
 
 let appConfig: AppConfig = configs;
+console.log("Worker started")
 
 //Track worker stats
 let processCount = 0;
@@ -18,6 +19,7 @@ let errorCount = 0;
 const queue_name = appConfig.queueName
 const fileController = new FileController();
 async function consume() {
+    console.log("Registering consumer...")
     try {
         const startCpu = process.cpuUsage();
         const startHr = process.hrtime.bigint();
@@ -136,3 +138,4 @@ process.on('unhandledRejection', (reason, promise) => {
 }, 10_000) */
 
 consume();
+console.log("Worker setup finished")
