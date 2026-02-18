@@ -26,6 +26,7 @@ export class FileController {
             const startTime = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
             const image_id: string = event.image_id;
             const worker_id: number = process.pid;
+            console.log("Worker is going to starttttttttttttttttttttttttt", image_id)
             if (image_id) {
                 console.log(`[Worker ${worker_id}] Received message for image_id ${image_id}`);
                 //It will create a race condition
@@ -81,6 +82,7 @@ export class FileController {
                         // 4. Execute the pipeline
                         await pipeline(input, transformer, output);
                         const update_obj: any = {status: 'resized', updated_timestamp: moment().format("YYYY-MM-DD HH:mm:ss")};
+                        console.log("update_ob,jjjjjjjjjjjjjjjj", update_obj, image_id)
                         const update = await this._filesModel.updateAnyRecord({image_id: image_id}, update_obj);
                         const endTime = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
                         const processingTime = moment(endTime).diff(moment(startTime), 'milliseconds');

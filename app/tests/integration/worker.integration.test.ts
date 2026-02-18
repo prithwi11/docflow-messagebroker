@@ -76,7 +76,6 @@ describe("Test 1: End-to-End Image Processing", () => {
                 
                     while (Date.now() - startTime < timeOutms) {
                         const file_details = await filesModel.findByAny({image_id: image_id});
-                        console.log("file_details", file_details)
 
                         if (file_details && file_details.status == expectedStatus) {
                             return true;
@@ -90,10 +89,9 @@ describe("Test 1: End-to-End Image Processing", () => {
                 }
 
 
-                const file_status = await waitForJobStatus(insert_to_test_file_obj.image_id, "resized", 10000);
-                // const file_status = await filesModel.findByAny({image_id: insert_to_test_file_obj.image_id});
-                // console.log("file_status", file_status)
-                // expect(file_status).toBe(true);
+                const file_status = await filesModel.findByAny({image_id: insert_to_test_file_obj.image_id});
+                console.log("file_status", file_status)
+                expect(file_status.status).toBe("resized");
             }
         }
     }, 30000)
