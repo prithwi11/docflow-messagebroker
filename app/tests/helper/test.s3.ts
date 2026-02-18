@@ -26,6 +26,7 @@ export class TestS3Config {
 
     public uploadFileToS3 = async(localFilePath: string, filename: string) => {
         let that = this;
+        console.log("S3 Bucket:", that._config.s3Bucket);
         return new Promise(function (resolve, reject) {
             const command = new PutObjectCommand({
                 Bucket: that._config.s3Bucket,
