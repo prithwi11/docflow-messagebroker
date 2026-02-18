@@ -6,6 +6,13 @@ services:
   
   rabbitmq:
     image: rabbitmq:3-management
+    ports:
+      - "5672-5672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics","check_running"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   localstack:
     image: localstack/localstack
@@ -32,6 +39,6 @@ services:
       TEST_QUEUE_NAME: file-processor-test
       TEST_DB_NAME: docflow_test
     depends_on:
-      - mongo
-      - rabbitmq
+        - mongo
+        - rabbitmq
     # command: npm run test
