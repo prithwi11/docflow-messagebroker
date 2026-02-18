@@ -11,7 +11,7 @@ dotenv.config()
 
 let appConfig: AppConfig = configs;
 console.log("Worker started")
-
+console.log("RabbitMQ Host:", appConfig.rabbitmqHost);
 //Track worker stats
 let processCount = 0;
 let errorCount = 0;
