@@ -24,7 +24,7 @@ async function consume() {
         const startCpu = process.cpuUsage();
         const startHr = process.hrtime.bigint();
 
-        const connection  = await amqp.connect(appConfig.rabbitmqHost as string);
+        const connection = await connectWithRetry(appConfig.rabbitmqHost as string);
         console.log("Connected to RabbitMQ Hosttttttt")
         const channel = await connection.createChannel();
         console.log("Channel createdddddddddd")
@@ -140,6 +140,20 @@ process.on('unhandledRejection', (reason, promise) => {
     workerMetrics.ackCount = 0;
     workerMetrics.cpu = [];
 }, 10_000) */
+async function connectWithRetry(url: string, retries = 10, delayMs = 2000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            console.log(`Attempting RabbitMQ connection (attempt ${i + 1})`);
+            const connection = await amqp.connect(url);
+            console.log("Connected to RabbitMQ");
+            return connection;
+        } catch (err) {
+            console.log("RabbitMQ connection failed, retrying...");
+            await new Promise(res => setTimeout(res, delayMs));
+        }
+    }
+    throw new Error("Failed to connect to RabbitMQ after retries");
+}
 
 consume();
 console.log("Worker setup finished")
