@@ -1,5 +1,5 @@
 import { S3helperClient, S3helperClientresponse } from "../../../common_interface";
-import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, HeadObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, HeadObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client, CreateBucketCommand } from "@aws-sdk/client-s3";
 import fs, { createWriteStream } from "fs"
 import { pipeline } from "stream/promises";
 import dotenv from "dotenv"
@@ -21,6 +21,20 @@ export class TestS3Config {
               accessKeyId: "test",
               secretAccessKey: "test"
             }
+        });
+    }
+
+    public createTestBucket = async() => {
+        let that = this;
+
+        const command = new CreateBucketCommand({
+            Bucket: that._config.s3Bucket,
+        });
+        return new Promise(function(resolve, reject) {
+            that.client.send(command, (err: object, data: S3helperClientresponse) => {
+                if (err) return resolve({error: true, message: "Unable to create test bucket", errorStack : err});
+                return resolve({error: false, message: "Test Bucketc created"})
+            })
         });
     }
 

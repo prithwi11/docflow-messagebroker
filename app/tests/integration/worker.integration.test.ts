@@ -22,6 +22,8 @@ describe("Test 1: End-to-End Image Processing", () => {
     let workerProcess: any;
 
     beforeAll(async() => {
+        const test_s3_setup = new TestS3Config();
+        const create_new_bucket: any = await test_s3_setup.createTestBucket();
         // const connection = await test_db.createStandaloneConnection();
         filesModel = new FileModel();
         jobsModel = new JobsModel();
