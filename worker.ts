@@ -137,5 +137,13 @@ process.on('unhandledRejection', (reason, promise) => {
     workerMetrics.cpu = [];
 }, 10_000) */
 
-consume();
+(async () => {
+    try {
+        await consume();
+        console.log("Worker fully initialized");
+    } catch (err) {
+        console.error("Worker failed during startup:", err);
+        process.exit(1);
+    }
+})();
 console.log("Worker setup finished")
