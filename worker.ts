@@ -25,20 +25,24 @@ async function consume() {
         const startHr = process.hrtime.bigint();
 
         const connection  = await amqp.connect(appConfig.rabbitmqHost as string);
+        console.log("Connected to RabbitMQ Hosttttttt")
         const channel = await connection.createChannel();
+        console.log("Channel createdddddddddd")
         await channel.assertQueue(queue_name, {
             durable: true,
             // deadLetterExchange : 'dlx_exchange',
             // deadLetterRoutingKey : 'dl1_key',
         });
+        console.log("Queue Asserteddddddd", queue_name);
 
         await channel.assertQueue('dlq_queue', {
             durable : true,
         });
+        console.log("Dead letter queueeeeeeeeeeeeee")
 
         await channel.assertExchange('dlx_exchange', 'direct', {durable : true});
         await channel.bindQueue('dlq_queue', 'dlx_exchange', 'dlq_queue');
-
+        console.log("Bindinggggggggggggg")
         console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue_name);
         channel.prefetch(1);
         channel.consume(queue_name, async function (message:any) {
