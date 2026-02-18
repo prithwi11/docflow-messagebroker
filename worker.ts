@@ -122,7 +122,7 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error(`[${process.pid}] Unhandled rejection:`, reason);
     process.exit(1);
 });
-setInterval(async() => {
+/* setInterval(async() => {
     const snapshot = await buildWorkerSnapshot();
     fs.appendFileSync(
         "./worker-metrics.json",
@@ -133,6 +133,6 @@ setInterval(async() => {
 
     workerMetrics.ackCount = 0;
     workerMetrics.cpu = [];
-}, 10_000)
+}, 10_000) */
 
 consume();
