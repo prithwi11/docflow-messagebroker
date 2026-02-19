@@ -69,8 +69,8 @@ export class FileController {
                         
                         const bucket_name = this._config.s3Bucket
                         console.log("starting downloading from s3", bucket_name, image_name, localInputPath)
-                        await this._awsHelper.downloadFromS3({bucket: bucket_name as string, key: image_name, destinationPath: localInputPath});
-                        console.log("downloaded from s3")
+                        const downloadFile = await this._awsHelper.downloadFromS3({bucket: bucket_name as string, key: image_name, destinationPath: localInputPath});
+                        console.log("downloaded from s3", downloadFile)
                         
                         const transformer = sharp()
                             .resize(800, 600)

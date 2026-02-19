@@ -1,13 +1,24 @@
-import { S3helperClient, S3helperClientresponse } from "../../../common_interface";
-import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, HeadObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client, CreateBucketCommand } from "@aws-sdk/client-s3";
-import fs, { createWriteStream } from "fs"
+import {
+    DeleteObjectCommand,
+    DeleteObjectsCommand,
+    GetObjectCommand,
+    HeadObjectCommand,
+    ListObjectsV2Command,
+    PutObjectCommand,
+    S3Client,
+    CreateBucketCommand,
+    CreateBucketCommandOutput
+} from "@aws-sdk/client-s3";
+
+import fs, { createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 dotenv.config();
+
 import { AppConfig, configs } from "../../../config/app.config";
 
 export class TestS3Config {
-    private client: S3helperClient;
+    private client: S3Client;
     private _config: AppConfig;
 
     constructor(appConfig: AppConfig = configs) {
@@ -18,146 +29,146 @@ export class TestS3Config {
             endpoint: "http://localstack:4566",
             forcePathStyle: true,
             credentials: {
-              accessKeyId: "test",
-              secretAccessKey: "test"
+                accessKeyId: "test",
+                secretAccessKey: "test"
             }
         });
     }
 
-    public createTestBucket = async() => {
-        let that = this;
+    // ✅ Create Bucket
+    public async createTestBucket() {
+        try {
+            const command = new CreateBucketCommand({
+                Bucket: this._config.s3Bucket,
+            });
 
-        const command = new CreateBucketCommand({
-            Bucket: that._config.s3Bucket,
-        });
-        return new Promise(function(resolve, reject) {
-            that.client.send(command, (err: object, data: S3helperClientresponse) => {
-                if (err) return resolve({error: true, message: "Unable to create test bucket", errorStack : err});
-                return resolve({error: false, message: "Test Bucketc created"})
-            })
-        });
+            await this.client.send(command);
+
+            return { error: false, message: "Test Bucket created" };
+        } catch (err) {
+            return { error: true, message: "Unable to create test bucket", errorStack: err };
+        }
     }
 
-    public uploadFileToS3 = async(localFilePath: string, filename: string) => {
-        let that = this;
-        console.log("S3 Bucket:", that._config.s3Bucket);
-        return new Promise(function (resolve, reject) {
+    // ✅ Upload
+    public async uploadFileToS3(localFilePath: string, filename: string) {
+        try {
+            console.log("S3 Bucket:", this._config.s3Bucket);
+
             const command = new PutObjectCommand({
-                Bucket: that._config.s3Bucket,
+                Bucket: this._config.s3Bucket,
                 Key: filename,
                 Body: fs.readFileSync(localFilePath)
             });
-            that.client.send(command, (err: object, data: S3helperClientresponse) => {
-                if (err) return resolve({error: true, message: "Unable to upload file in s3", errorStack: err});
-                else {
-                    fs.unlink(localFilePath, (err => {
-                        if (err) console.error(err)
-                    }));
-                return resolve({error: false, message: "File uploaded to S3"})
-                }
-            })
-        })
+
+            await this.client.send(command);
+
+            fs.unlinkSync(localFilePath);
+
+            return { error: false, message: "File uploaded to S3" };
+        } catch (err) {
+            return { error: true, message: "Unable to upload file in S3", errorStack: err };
+        }
     }
 
-    public deleteFileFromS3 = async(filepath: string) => {
-        let that = this;
-        return new Promise(function (resolve, reject) {
+    // ✅ Delete Single File
+    public async deleteFileFromS3(filepath: string) {
+        try {
             const command = new DeleteObjectCommand({
-                Bucket: that._config.s3Bucket,
+                Bucket: this._config.s3Bucket,
                 Key: filepath
             });
 
-            that.client.send(command, (err: object, data: S3helperClientresponse) => {
-                if (err) {
-                    return resolve({error: true, message: "Unable to upload file in S3", errorStack: err});
-                }
-                else {
-                    return resolve({error:false, message:'File deleted successfully from S3.',data:data});
-                }
-            })
-        })
-    }
+            const data = await this.client.send(command);
 
-    public async downloadFromS3(params: { bucket: string; key: string; destinationPath: string }) {
-        const command = new GetObjectCommand({
-            Bucket: params.bucket,
-            Key: params.key,
-        });
-
-        const response = await this.client.send(command, (err: object) => {
-            if (err) {
-                throw new Error("Error fetching object from S3: " + err);
-            }
-        });
-
-        if (!response.Body) {
-            throw new Error("S3 object has no body");
+            return { error: false, message: "File deleted successfully from S3.", data };
+        } catch (err) {
+            return { error: true, message: "Unable to delete file in S3", errorStack: err };
         }
-
-        await pipeline(
-            response.Body as NodeJS.ReadableStream,
-            createWriteStream(params.destinationPath)
-        );
-    
-        return {
-          success: true,
-          message: "File downloaded successfully",
-          path: params.destinationPath,
-        };
     }
 
-    public async cleanTestBucket() {
-        let isTruncated: boolean = true;
-        let continuationToken;
-
-        while (isTruncated) {
-            const list_params = {
-                Bucket: this._config.s3Bucket,
-                ContinuationToken: continuationToken
-            }
-
-            const { Contents, IsTruncated, NextContinuationToken } = await this.client.send(new ListObjectsV2Command(list_params), (err: object) => {
-                if (err) {
-                    throw new Error("Error listing objects from S3: " + err);
-                }
+    // ✅ Download
+    public async downloadFromS3(params: { bucket: string; key: string; destinationPath: string }) {
+        try {
+            const command = new GetObjectCommand({
+                Bucket: params.bucket,
+                Key: params.key,
             });
 
+            const response = await this.client.send(command);
+
+            if (!response.Body) {
+                throw new Error("S3 object has no body");
+            }
+
+            await pipeline(
+                response.Body as NodeJS.ReadableStream,
+                createWriteStream(params.destinationPath)
+            );
+
+            return {
+                success: true,
+                message: "File downloaded successfully",
+                path: params.destinationPath,
+            };
+
+        } catch (err) {
+            throw new Error("Error fetching object from S3: " + err);
+        }
+    }
+
+    // ✅ Clean Entire Bucket
+    public async cleanTestBucket() {
+        let isTruncated = true;
+        let continuationToken: string | undefined;
+
+        while (isTruncated) {
+            const listParams = {
+                Bucket: this._config.s3Bucket,
+                ContinuationToken: continuationToken
+            };
+
+            const listResponse = await this.client.send(
+                new ListObjectsV2Command(listParams)
+            );
+
+            const { Contents, IsTruncated, NextContinuationToken } = listResponse;
+
             if (!Contents || Contents.length === 0) break;
+
             const deleteParams = {
                 Bucket: this._config.s3Bucket,
                 Delete: {
-                  Objects: Contents.map((item: any) => ({ Key: item.Key })),
-                  Quiet: true,
+                    Objects: Contents.map((item: any) => ({ Key: item.Key })),
+                    Quiet: true,
                 },
             };
 
-            await this.client.send(new DeleteObjectsCommand(deleteParams), (err: object) => {
-                if (err) {
-                    throw new Error("Error deleting all objects from S3: " + err);
-                }
-            });
+            await this.client.send(new DeleteObjectsCommand(deleteParams));
+
             console.log(`Deleted ${Contents.length} objects.`);
 
-            // 4. Check if more files remain
-            isTruncated = IsTruncated;
+            isTruncated = !!IsTruncated;
             continuationToken = NextContinuationToken;
         }
     }
 
+    // ✅ Verify Object Exists
     public async verifyS3ObjectExists(file_name: string) {
-        const command = new HeadObjectCommand({
-            Bucket: this._config.s3Bucket,
-            Key: `resized/${file_name}`
-        });
+        try {
+            const command = new HeadObjectCommand({
+                Bucket: this._config.s3Bucket,
+                Key: `resized/${file_name}`
+            });
 
-        await this.client.send(command, (err: any) => {
-            if (err) {
-                if (err.name == "NotFound" || err.$metadata?.httpStatusCode === 404) {
-                    return false
-                }
-                throw new Error(err);
+            await this.client.send(command);
+            return true;
+
+        } catch (err: any) {
+            if (err.name === "NotFound" || err.$metadata?.httpStatusCode === 404) {
+                return false;
             }
-        });
-        return true;
+            throw err;
+        }
     }
 }
