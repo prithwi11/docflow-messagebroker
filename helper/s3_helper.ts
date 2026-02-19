@@ -32,6 +32,11 @@ export class AwsHelper {
       Bucket: params.bucket,
       Key: params.key,
     });
+    console.log("S3 Config:", {
+      region: this.client.config.region,
+      endpoint: this.client.config.endpoint,
+      credentials: this.client.config.credentials
+    });
 
     const response = await this.client.send(command);
 
