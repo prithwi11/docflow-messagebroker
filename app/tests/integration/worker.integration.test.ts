@@ -13,6 +13,7 @@ import { spawnWorker } from "../helper/test.worker";
 import dotenv from "dotenv"
 dotenv.config()
 import fs from "fs"
+import { startWorker, stopWorker } from "../../../worker.core";
 
 
 describe("Test 1: End-to-End Image Processing", () => {
@@ -29,11 +30,13 @@ describe("Test 1: End-to-End Image Processing", () => {
         jobsModel = new JobsModel();
 
         // Start worker process
-        workerProcess = await spawnWorker();
+        // workerProcess = await spawnWorker();
+        await startWorker();
     });
 
     afterAll(async() => {
-        workerProcess.kill('SIGTERM')
+        // workerProcess.kill('SIGTERM')
+        await stopWorker();
         await test_db.closeConnection();
     })
 
