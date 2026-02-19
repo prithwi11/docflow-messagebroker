@@ -10,9 +10,14 @@ export class AwsHelper {
 
   constructor(appConfig: AppConfig = configs) {
     this._config = appConfig;
+    const isLocal = this._config.environment == "test" ? true : false;
 
     this.client = new S3Client({
       region: this._config.awsRegion!,
+      ...(isLocal && {
+        endpoint: 'http://localstack:4566',
+        forcePathStyle: true
+      }),
       credentials: {
             accessKeyId: this._config.awsAccessKey as string,
             secretAccessKey: this._config.awsSecretAccessKey as string
