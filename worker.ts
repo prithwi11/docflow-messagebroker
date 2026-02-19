@@ -45,6 +45,7 @@ async function consume() {
         console.log("Bindinggggggggggggg")
         console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", queue_name);
         channel.prefetch(1);
+        console.log("About to call channel.consume");
         channel.consume(queue_name, async function (message:any) {
             console.log("[%s] Received with id (%s) message: %s", message.properties.correlationId, message.properties.messageId, message.content.toString());
 

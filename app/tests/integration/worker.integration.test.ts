@@ -68,7 +68,7 @@ describe("Test 1: End-to-End Image Processing", () => {
                 // Send the file to rabbitmq
                 const test_sqs_helper = new TestSQSHelper();
                 const test_process_image = test_sqs_helper.pushMessageToQueue({image_name: test_image, startTime: startTime, image_id: insert_to_test_file_obj.image_id});
-
+                console.log("Message published");
                 // Need to check worker
                 //Wait for job status
                 const waitForJobStatus = async(image_id: string, expectedStatus: string, timeOutms: number = 5000) => {
