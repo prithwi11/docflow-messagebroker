@@ -61,14 +61,16 @@ export class FileController {
                         const image_name = image_details.image_name;
                         console.log("this._config.imagePath", this._config)
                         const localInputPath = path.resolve(this._config.imagePath, image_name);
-                        
+                        console.log("locslInputPath", localInputPath);
                         // 2. Set up source and destination paths
                         const outputDir = path.dirname(localInputPath);
                         const outputFileName = `${path.parse(image_name).name}.webp`;
                         const outputPath = path.join(outputDir, outputFileName);
                         
                         const bucket_name = this._config.s3Bucket
+                        console.log("starting downloading from s3", bucket_name, image_name, localInputPath)
                         await this._awsHelper.downloadFromS3({bucket: bucket_name as string, key: image_name, destinationPath: localInputPath});
+                        console.log("downloaded from s3")
                         
                         const transformer = sharp()
                             .resize(800, 600)
