@@ -3,7 +3,7 @@ import { FileController } from "./app/controllers/file_controller";
 import { workerMetricsEmitter } from "./app/Metrics/workerEventEmitter";
 import { buildWorkerSnapshot } from "./app/Metrics/workerSnapshot";
 import { workerMetrics } from "./app/Metrics/workerMetrics";
-import "../Metrics/workerListener";
+import "./app/Metrics/workerListener"
 import { AppConfig, configs } from "./config/app.config";
 
 let appConfig: AppConfig = configs;
