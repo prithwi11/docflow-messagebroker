@@ -76,13 +76,15 @@ export class FileController {
                             .resize(800, 600)
                             .webp({ quality: 80 })
                             .on('info', (info) => console.log("Image processed:"));
-                    
+                        console.log("Image sharped")
                         // 3. Create file streams
                         const input = fs.createReadStream(localInputPath);
+                        console.log("Image streamed 1")
                         const output = fs.createWriteStream(outputPath);
-                    
+                        console.log("Image Streamed 2")
                         // 4. Execute the pipeline
                         await pipeline(input, transformer, output);
+                        console.log("Image pipelined")
                         const update_obj: any = {status: 'resized', updated_timestamp: moment().format("YYYY-MM-DD HH:mm:ss")};
                         console.log("update_ob,jjjjjjjjjjjjjjjj", update_obj, image_id)
                         const update = await this._filesModel.updateAnyRecord({image_id: image_id}, update_obj);
