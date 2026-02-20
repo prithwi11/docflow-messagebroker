@@ -36,7 +36,7 @@ services:
       MONGODB_URI: mongodb://mongo:27017/testdb
       RABBITMQ_HOST: amqp://rabbitmq:5672
       AWS_DEFAULT_REGION: us-east-1
-      AWS_ACCESS_KEY_ID: test
+      AWS_ACCESS_KEY: test
       AWS_SECRET_ACCESS_KEY: test
       S3_ENDPOINT: http://localstack:4566
       S3_TEST_BUCKET: test-bucket
