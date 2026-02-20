@@ -43,7 +43,7 @@ services:
       S3_BUCKET: test-bucket
       TEST_QUEUE_NAME: file-processor-test
       TEST_DB_NAME: docflow_test
-      TEST_IMAGE_PATH: /app/tests/uploads/
+      TEST_IMAGE_PATH: /app/app/tests/uploads
     depends_on:
         - mongo
         - rabbitmq
