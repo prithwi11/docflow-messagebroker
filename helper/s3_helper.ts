@@ -42,6 +42,11 @@ export class AwsHelper {
       endpoint: this.client.config.endpoint,
       credentials: this.client.config.credentials
     });
+    console.log("AWS CONFIG VALUES:", {
+      region: this._config.awsRegion,
+      accessKey: this._config.awsAccessKey,
+      secret: this._config.awsSecretAccessKey,
+    });
 
     const response = await this.client.send(command);
 
