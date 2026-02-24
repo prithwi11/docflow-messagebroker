@@ -99,7 +99,7 @@ jobs:
             echo "Starting new container"
             docker run -d \
               --name worker \
-              --restart unless-stopper \
+              --restart unless-stopped \
               --env-file .env \
               ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.${{secrets.AWS_REGION}}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
             echo "Deployment completed"
