@@ -27,7 +27,7 @@ async function getQueueDepth() {
     const channel = await connection.createChannel();
     const queue_name: string = appConfig.queueName as string;
     
-    const result = await channel.assertQueue(queue_name);
+    const result = await channel.assertQueue(queue_name, {durable: true});
 
     const queue_depth = result.messageCount;
     console.log("QUEUE DEPTH", queue_depth);
